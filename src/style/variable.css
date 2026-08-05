@@ -1,0 +1,52 @@
+:root {
+    /* Font family */
+    --font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    /* Colors - Premium Midnight Azure Palette */
+    --color-bg: #030712;
+    --color-card-bg: rgba(17, 24, 39, 0.7);
+    --color-card-border: rgba(255, 255, 255, 0.1);
+    
+    --color-primary: #3b82f6;
+    --color-primary-glow: rgba(59, 130, 246, 0.5);
+    --color-secondary: #06b6d4;
+    --color-accent: #8b5cf6;
+    --color-text: #f3f4f6;
+    --color-text-muted: #9ca3af;
+    
+    --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+    /* Font sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    
+    --font-size-adaptive: clamp(var(--font-size-base), 4vw, var(--font-size-lg));
+
+    /* Effects */
+    --glass-blur: blur(12px);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 20px 0 var(--color-primary-glow);
+
+    /* Animation speeds */
+    --trans-fast: 0.2s;
+    --trans-normal: 0.3s;
+    --trans-slow: 0.5s;
+
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+}

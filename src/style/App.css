@@ -1,0 +1,87 @@
+@import './variable.css';
+
+.container-main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    transition: opacity var(--trans-normal);
+}
+
+.btn-open-form {
+    align-self: flex-start;
+    background: var(--color-card-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-open-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.btn-open-form:hover::before {
+    left: 100%;
+}
+
+.btn-open-form:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--color-primary-glow);
+}
+
+.btn-open-form:active {
+    transform: translateY(0);
+}
+
+.btn-open-form:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hide {
+    opacity: 0.3;
+    pointer-events: none;
+    filter: blur(2px);
+}
+
+.container-outer {
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .container-main {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+    
+    .btn-open-form {
+        width: 100%;
+        justify-content: center;
+    }
+}

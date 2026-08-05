@@ -1,0 +1,54 @@
+@import "./variable.css";
+
+.extra-hours-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.extra-hours-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.extra-hours-title {
+  font-size: var(--font-size-lg);
+}
+
+.extra-hours-form {
+  padding: 1.5rem;
+}
+
+.extra-hours-form-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.select-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.field-label-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-left: 0.5rem;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-muted);
+}
+
+.delete-icon {
+  width: 18px;
+  height: 18px;
+}

@@ -1,0 +1,112 @@
+@import "./variable.css";
+
+/* ===== Minimalistic persons & hours table ===== */
+.persons-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--color-card-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.persons-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+.persons-table th {
+  padding: 0.9rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 2px solid var(--color-card-border);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-bold);
+  text-align: left;
+}
+
+.persons-table td {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--color-card-border);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  transition: background var(--trans-fast);
+}
+
+.persons-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.persons-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.persons-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Link to person detail */
+.pt-name {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+
+.pt-name:hover {
+  text-decoration: underline;
+}
+
+/* Muted secondary cell */
+.pt-muted {
+  color: var(--color-text-muted);
+}
+
+/* Hours total — accent */
+.pt-hours {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Status pill */
+.pt-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.pt-on {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.pt-off {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+}
+
+/* Empty state */
+.persons-table-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-card-bg);
+  border: 1px dashed var(--color-card-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+}
+
+/* Narrow screens */
+@media (max-width: 640px) {
+  .persons-table th,
+  .persons-table td {
+    padding: 0.7rem 0.9rem;
+  }
+}
