@@ -1,8 +1,8 @@
 function smallerNumbersThanCurrent(nums: number[]): number[] {
   let counter = 0;
-  let list_out = [];
+  const list_out = [];
   for (let i = 0; i < nums.length; i++) {
-    let number = nums[i];
+    const number = nums[i];
     for (let j = 0; j < nums.length; j++) {
       if (number !== nums[j] && number > nums[j]) counter += 1;
     }

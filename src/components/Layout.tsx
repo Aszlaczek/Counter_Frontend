@@ -5,7 +5,7 @@ import ToastViewport from "./ToastViewport";
 const navItems = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/persons", label: "Osoby" },
-  { to: "/extra-hours", label: "Nadgodziny" },
+  { to: "/extra-hours", label: "Ewidencja czasu" },
 ];
 
 const Layout = () => {

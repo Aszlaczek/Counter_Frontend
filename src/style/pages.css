@@ -490,3 +490,9 @@
     width: 100%;
   }
 }
+
+.time-filters { align-items: end; flex-wrap: wrap; gap: 1rem; }
+.time-filters label { display: flex; flex-direction: column; gap: .4rem; flex: 1 1 150px; }
+.time-filters select[multiple] { min-height: 120px; }
+.time-filters small { font-size: .8rem; }
+.time-filters input { padding: .65rem; border-radius: .5rem; color: inherit; background: var(--bg-secondary, #202536); border: 1px solid #657087; }

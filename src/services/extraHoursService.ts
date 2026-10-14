@@ -1,3 +1,4 @@
+import { fetchAllPages } from "./pagination";
 import api from "./api";
 import type {
   ExtraHours,
@@ -16,6 +17,10 @@ export const extraHoursService = {
   async getAll(params?: ExtraHoursListParams): Promise<ExtraHours[]> {
     const res = await api.get<ExtraHours[]>("/api/extra-hours/", { params });
     return res.data;
+  },
+
+  async getAllRecords(): Promise<ExtraHours[]> {
+    return fetchAllPages(params => extraHoursService.getAll(params));
   },
 
   async getById(id: number): Promise<ExtraHours> {

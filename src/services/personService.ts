@@ -1,3 +1,4 @@
+import { fetchAllPages } from "./pagination";
 import api from "./api";
 import type {
   Person,
@@ -16,6 +17,10 @@ export const personService = {
   async getAll(params?: PersonListParams): Promise<Person[]> {
     const res = await api.get<Person[]>(`/api/persons/`, { params });
     return res.data;
+  },
+
+  async getAllRecords(): Promise<Person[]> {
+    return fetchAllPages(params => personService.getAll(params));
   },
 
   async getById(id: number): Promise<PersonDetailResponse> {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { extraHoursService } from "../services/extraHoursService";
 import { personService } from "../services/personService";
 import type { ExtraHoursSummary as SummaryType, Person } from "../type";
@@ -22,7 +22,7 @@ const ExtraHoursSummary = () => {
     fetchPersons();
   }, []);
 
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     if (!selectedPersonId) return;
     setLoading(true);
     try {
@@ -33,7 +33,7 @@ const ExtraHoursSummary = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedPersonId]);
 
   useEffect(() => {
     if (selectedPersonId) {
@@ -41,7 +41,7 @@ const ExtraHoursSummary = () => {
     } else {
       setSummary(null);
     }
-  }, [selectedPersonId]);
+  }, [selectedPersonId, fetchSummary]);
 
   return (
     <div className="summary-container">

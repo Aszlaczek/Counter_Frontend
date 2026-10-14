@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { personService } from "../services/personService";
 import { extraHoursService } from "../services/extraHoursService";
 import { useAuthStore } from "../store";
-import type { PersonDetailResponse } from "../type";
+import { summarizeRecords } from "../utils/timeRecords";
 import Spinner from "../components/ui/Spinner";
 import EmptyState from "../components/ui/EmptyState";
 import MinutesConverter from "../components/MinutesConverter";
@@ -42,14 +42,12 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const [persons, records] = await Promise.all([
-          personService.getAll({ limit: 500 }),
-          extraHoursService.getAll({ limit: 500 }),
+          personService.getAllRecords(),
+          extraHoursService.getAllRecords(),
         ]);
 
-        // Fetch details (with summary) for each person to compute hours.
-        const details: PersonDetailResponse[] = await Promise.all(
-          persons.map((p) => personService.getById(p.id)),
-        );
+        const summaries = new Map(summarizeRecords(records).map(s => [s.personId, s]));
+        const details = persons.map(p => ({ ...p, total_extra_hours: (summaries.get(p.id)?.balance ?? 0) / 60, extra_hours_count: summaries.get(p.id)?.count ?? 0 }));
 
         const totalHours = details.reduce(
           (sum, d) => sum + (d.total_extra_hours || 0),
@@ -89,8 +87,8 @@ const Dashboard = () => {
 
   const statCards = [
     { label: "Osoby", value: stats.persons, icon: "👥" },
-    { label: "Rekordy nadgodzin", value: stats.records, icon: "📋" },
-    { label: "Łączne godziny", value: `${stats.totalHours} h`, icon: "⏱️" },
+    { label: "Wpisy czasu", value: stats.records, icon: "📋" },
+    { label: "Saldo godzin", value: `${stats.totalHours} h`, icon: "⏱️" },
   ];
 
   return (
@@ -99,11 +97,11 @@ const Dashboard = () => {
         <div>
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">
-            Witaj, {user?.name} {user?.surname}! Oto przegląd nadgodzin.
+            Witaj, {user?.name} {user?.surname}! Oto przegląd ewidencji czasu.
           </p>
         </div>
         <Link to="/extra-hours/new" className="btn-primary">
-          + Dodaj nadgodziny
+          + Dodaj wpis
         </Link>
       </header>
 
@@ -132,7 +130,7 @@ const Dashboard = () => {
 
       <section className="dashboard-section">
         <div className="section-header">
-          <h2 className="section-title">Nadgodziny osób</h2>
+          <h2 className="section-title">Saldo osób</h2>
           <Link to="/persons" className="link-muted">
             Zobacz wszystkie →
           </Link>

@@ -1,0 +1,37 @@
+import { beforeEach, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import ExtraHoursList from '../src/pages/ExtraHoursList';
+import { personService } from '../src/services/personService';
+import { extraHoursService } from '../src/services/extraHoursService';
+import { downloadRecords } from '../src/utils/exportRecords';
+import type { ExtraHours } from '../src/type';
+vi.mock('../src/services/personService', () => ({ personService: { getAllRecords: vi.fn() } }));
+vi.mock('../src/services/extraHoursService', () => ({ extraHoursService: { getAllRecords: vi.fn() } }));
+vi.mock('../src/utils/exportRecords', () => ({ downloadRecords: vi.fn() }));
+beforeEach(() => { vi.clearAllMocks(); vi.mocked(personService.getAllRecords).mockResolvedValue([{ id: 1, name: 'Jan', surname: 'Nowak', faculty: '', is_working: true, created_by_id: 1, created_at: '', updated_at: '' }]); });
+it('exports the complete filtered quarter across UI pages', async () => {
+  const user = userEvent.setup();
+  const rows = Array.from({ length: 25 }, (_, id) => ({ id, person_id: 1, date: id < 21 ? '2024-03-31' : '2024-04-01', hours: 1, minutes: 0, description: null })) as ExtraHours[];
+  vi.mocked(extraHoursService.getAllRecords).mockResolvedValue(rows);
+  render(<MemoryRouter><ExtraHoursList /></MemoryRouter>);
+  await screen.findByRole('button', { name: /Eksportuj Excel/ });
+  await user.selectOptions(screen.getByLabelText('Rok'), '2024');
+  await user.selectOptions(screen.getByLabelText('Kwartał'), '1');
+  await user.click(screen.getByRole('button', { name: 'Eksportuj Excel (.xlsx) — 21 wpisów' }));
+  await waitFor(() => expect(downloadRecords).toHaveBeenCalledOnce());
+  expect(vi.mocked(downloadRecords).mock.calls[0][0]).toHaveLength(21);
+  expect(vi.mocked(downloadRecords).mock.calls[0][2]).toMatchObject({ year: '2024', quarter: '1' });
+  await user.type(screen.getByLabelText('Od'), '2024-04-02');
+  await user.type(screen.getByLabelText('Do'), '2024-04-01');
+  expect(screen.getByRole('alert')).toHaveTextContent('Data „Od”');
+  expect(screen.getByRole('button', { name: /Eksportuj Excel/ })).toBeDisabled();
+});
+it('does not expose export after a failed complete-data fetch', async () => {
+  vi.mocked(extraHoursService.getAllRecords).mockRejectedValue(new Error('offline'));
+  render(<MemoryRouter><ExtraHoursList /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.queryByRole('button', { name: /Eksportuj Excel/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Spróbuj ponownie' })).toBeInTheDocument();
+});

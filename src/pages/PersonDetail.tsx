@@ -20,6 +20,7 @@ const PersonDetail = () => {
   const [records, setRecords] = useState<ExtraHours[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [deletePerson, setDeletePerson] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
@@ -27,7 +28,7 @@ const PersonDetail = () => {
     try {
       const [detail, hours] = await Promise.all([
         personService.getById(personId),
-        extraHoursService.getAll({ person_id: personId, limit: 500 }),
+        extraHoursService.getAllRecords().then(rows => rows.filter(r => r.person_id === personId)),
       ]);
       setPerson(detail);
       setRecords(hours);
@@ -115,13 +116,14 @@ const PersonDetail = () => {
           <button
             type="button"
             className="btn-danger"
-            onClick={() => setDeleteTarget(person.id)}
+            onClick={() => setDeletePerson(true)}
           >
             Usuń osobę
           </button>
         </div>
       </header>
 
+      <Link className="btn-outline" to={`/extra-hours?person_id=${person.id}`}>Filtruj i eksportuj czas tej osoby</Link>
       <section className="detail-cards">
         <div className="stat-card">
           <span className="stat-icon" aria-hidden="true">
@@ -129,7 +131,7 @@ const PersonDetail = () => {
           </span>
           <div>
             <p className="stat-value">{person.total_extra_hours ?? 0} h</p>
-            <p className="stat-label">Łączne nadgodziny</p>
+            <p className="stat-label">Saldo godzin</p>
           </div>
         </div>
         <div className="stat-card">
@@ -156,12 +158,12 @@ const PersonDetail = () => {
 
       <section className="dashboard-section">
         <div className="section-header">
-          <h2 className="section-title">Rekordy nadgodzin</h2>
+          <h2 className="section-title">Wpisy czasu</h2>
           <Link
             to={`/extra-hours/new?person_id=${person.id}`}
             className="btn-primary"
           >
-            + Dodaj nadgodziny
+            + Dodaj wpis
           </Link>
         </div>
 
@@ -205,23 +207,23 @@ const PersonDetail = () => {
       </section>
 
       <ConfirmDialog
-        open={deleteTarget === person.id}
+        open={deletePerson}
         title="Usunąć osobę?"
         message={`Ta operacja usunie osobę ${person.name} ${person.surname} ORAZ wszystkie jej rekordy nadgodzin. Tej operacji nie można cofnąć.`}
         confirmLabel="Usuń"
         loading={deleting}
         onConfirm={handleDeletePerson}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => { setDeleteTarget(null); setDeletePerson(false); }}
       />
 
       <ConfirmDialog
-        open={deleteTarget !== null && deleteTarget !== person.id}
+        open={deleteTarget !== null}
         title="Usunąć rekord?"
         message="Ten rekord nadgodzin zostanie trwale usunięty."
         confirmLabel="Usuń"
         loading={deleting}
         onConfirm={handleDeleteRecord}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => { setDeleteTarget(null); setDeletePerson(false); }}
       />
     </div>
   );

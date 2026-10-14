@@ -1,3 +1,5 @@
+import EntryKindSelect from "../components/EntryKindSelect";
+import { signedDuration, entryKind, type EntryKind } from "../utils/timeRecords";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { extraHoursService } from "../services/extraHoursService";
@@ -15,6 +17,7 @@ const ExtraHoursEdit = () => {
 
   const [persons, setPersons] = useState<Person[]>([]);
   const [personId, setPersonId] = useState<number>(0);
+  const [kind, setKind] = useState<EntryKind>("overtime");
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
   const [description, setDescription] = useState("");
@@ -28,11 +31,12 @@ const ExtraHoursEdit = () => {
       try {
         const [record, personsData] = await Promise.all([
           extraHoursService.getById(recordId),
-          personService.getAll({ limit: 500 }),
+          personService.getAllRecords(),
         ]);
         setPersonId(record.person_id);
-        setHours(String(record.hours));
-        setMinutes(String(record.minutes));
+        setKind(entryKind(record));
+        setHours(String(Math.floor(Math.abs(record.hours * 60 + record.minutes) / 60)));
+        setMinutes(String(Math.abs(record.hours * 60 + record.minutes) % 60));
         setDescription(record.description ?? "");
         setDate(record.date);
         setPersons(personsData);
@@ -48,15 +52,15 @@ const ExtraHoursEdit = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try { signedDuration(hours, minutes, kind); } catch (err) { toast.error((err as Error).message); return; }
     setSaving(true);
     try {
       await extraHoursService.update(recordId, {
-        hours: hours ? Number(hours) : undefined,
-        minutes: minutes ? Number(minutes) : undefined,
+        ...signedDuration(hours, minutes, kind),
         description: description || null,
-        date: date || null,
+        ...(date ? { date } : {}),
       });
-      toast.success("Rekord nadgodzin został zaktualizowany.");
+      toast.success("Wpis czasu został zaktualizowany.");
       navigate("/extra-hours");
     } catch (err) {
       toast.error(
@@ -75,9 +79,9 @@ const ExtraHoursEdit = () => {
     <div className="crud-page">
       <header className="page-header">
         <div>
-          <h1 className="page-title">Edytuj nadgodziny</h1>
+          <h1 className="page-title">Edytuj wpis</h1>
           <p className="page-subtitle">
-            Zaktualizuj rekord nadgodzin #{recordId}.
+            Zaktualizuj wpis czasu #{recordId}.
           </p>
         </div>
         <button
@@ -102,6 +106,7 @@ const ExtraHoursEdit = () => {
           )}
         </div>
 
+        <EntryKindSelect value={kind} onChange={setKind} />
         <div className="form-row">
           <label htmlFor="ee-hours">
             <span className="field-label-text">Godziny</span>

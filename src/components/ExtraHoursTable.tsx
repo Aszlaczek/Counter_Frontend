@@ -1,3 +1,4 @@
+import { entryKind, kindLabel, totalMinutes, formatTime } from "../utils/timeRecords";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import "../style/PersonsTable.css";
@@ -44,8 +45,8 @@ const ExtraHoursTable = ({
           <tr>
             <th>Data</th>
             <th>Osoba</th>
-            <th className="num">Godziny</th>
-            <th className="num">Minuty</th>
+            <th>Rodzaj</th>
+            <th className="num">Czas ze znakiem</th>
             <th>Opis</th>
             {renderActions && <th className="num">Akcje</th>}
           </tr>
@@ -59,8 +60,8 @@ const ExtraHoursTable = ({
                   {r.person_name}
                 </Link>
               </td>
-              <td className="num pt-muted">{r.hours}</td>
-              <td className="num pt-muted">{r.minutes}</td>
+              <td>{kindLabel(entryKind(r))}</td>
+              <td className="num pt-muted">{formatTime(totalMinutes(r))}</td>
               <td className="pt-muted">{r.description || "—"}</td>
               {renderActions && (
                 <td className="num">

@@ -1,3 +1,6 @@
+import PersonForm from "../components/PersonForm";
+import EntryKindSelect from "../components/EntryKindSelect";
+import { signedDuration, type EntryKind } from "../utils/timeRecords";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { extraHoursService } from "../services/extraHoursService";
@@ -7,7 +10,7 @@ import { getApiErrorDetail } from "../utils/apiErrors";
 import MinutesConverter from "../components/MinutesConverter";
 import type { Person } from "../type";
 
-const today = () => new Date().toISOString().split("T")[0];
+const today = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`; };
 
 const ExtraHoursCreate = () => {
   const navigate = useNavigate();
@@ -15,8 +18,10 @@ const ExtraHoursCreate = () => {
   // Optional pre-selected person passed via ?person_id=... (e.g. from a person's detail page).
   const preselectId = Number(searchParams.get("person_id")) || 0;
 
+  const [addingPerson, setAddingPerson] = useState(false);
   const [persons, setPersons] = useState<Person[]>([]);
   const [personId, setPersonId] = useState<number>(preselectId);
+  const [kind, setKind] = useState<EntryKind>("overtime");
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
   const [description, setDescription] = useState("");
@@ -27,7 +32,7 @@ const ExtraHoursCreate = () => {
   useEffect(() => {
     const loadPersons = async () => {
       try {
-        const data = await personService.getAll({ limit: 500 });
+        const data = await personService.getAllRecords();
         setPersons(data);
         // If a person was pre-linked via query param, ensure it exists in the list.
         if (preselectId && !data.some((p) => p.id === preselectId)) {
@@ -48,16 +53,16 @@ const ExtraHoursCreate = () => {
       toast.error("Wybierz osobę.");
       return;
     }
+    try { signedDuration(hours, minutes, kind); } catch (err) { toast.error((err as Error).message); return; }
     setLoading(true);
     try {
       await extraHoursService.create({
         person_id: personId,
-        hours: hours ? Number(hours) : undefined,
-        minutes: minutes ? Number(minutes) : undefined,
+        ...signedDuration(hours, minutes, kind),
         description: description || null,
-        date: date || null,
+        ...(date ? { date } : {}),
       });
-      toast.success("Rekord nadgodzin został dodany.");
+      toast.success("Wpis czasu został dodany.");
       navigate("/extra-hours");
     } catch (err) {
       toast.error(getApiErrorDetail(err, "Nie udało się dodać rekordu."));
@@ -70,9 +75,9 @@ const ExtraHoursCreate = () => {
     <div className="crud-page">
       <header className="page-header">
         <div>
-          <h1 className="page-title">Dodaj nadgodziny</h1>
+          <h1 className="page-title">Dodaj wpis</h1>
           <p className="page-subtitle">
-            Dodaj nowy rekord nadgodzin dla osoby.
+            Dodaj wyjście lub nadgodziny dla osoby.
           </p>
         </div>
         <button
@@ -84,6 +89,8 @@ const ExtraHoursCreate = () => {
         </button>
       </header>
 
+      <button type="button" className="btn-outline" disabled={loading || personsLoading} onClick={() => setAddingPerson(v => !v)}>+ Dodaj nową osobę tutaj</button>
+      {addingPerson && <section aria-label="Nowa osoba"><h2>Nowa osoba</h2><PersonForm onCreated={person => { setPersons(prev => [...prev, person]); setPersonId(person.id); setAddingPerson(false); }} onCancel={() => setAddingPerson(false)} /></section>}
       <form onSubmit={handleSubmit} className="form-page">
         <label htmlFor="eh-person">
           <span className="field-label-text">Osoba *</span>
@@ -93,7 +100,7 @@ const ExtraHoursCreate = () => {
             value={personId}
             onChange={(e) => setPersonId(Number(e.target.value))}
             required
-            disabled={personsLoading || preselectId > 0}
+            disabled={personsLoading}
           >
             <option value={0}>-- Wybierz osobę --</option>
             {persons.map((p) => (
@@ -104,12 +111,9 @@ const ExtraHoursCreate = () => {
           </select>
         </label>
 
-        {preselectId > 0 && (
-          <p className="converter-hint">
-            ✓ Osoba została automatycznie wybrana i jest zablokowana.
-          </p>
-        )}
 
+
+        <EntryKindSelect value={kind} onChange={setKind} />
         <div className="form-row">
           <label htmlFor="eh-hours">
             <span className="field-label-text">Godziny</span>
@@ -177,8 +181,8 @@ const ExtraHoursCreate = () => {
           >
             Anuluj
           </button>
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? "Dodawanie..." : "Dodaj nadgodziny"}
+          <button type="submit" className="btn-primary" disabled={loading || personsLoading || addingPerson}>
+            {loading ? "Dodawanie..." : "Dodaj wpis"}
           </button>
         </div>
       </form>
